@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer base {
+  .theme {
+    --font-heading: var(--font-sans);
+  }
+  :root {
+    --background: #2d1b69;
+    --foreground: #f4f2ff;
+    --card: #24145a;
+    --card-foreground: #f4f2ff;
+    --popover: #24145a;
+    --popover-foreground: #f4f2ff;
+    --primary: #00d4ff;
+    --primary-foreground: #1a0f3e;
+    --secondary: #3d2a7a;
+    --secondary-foreground: #f4f2ff;
+    --muted: #362069;
+    --muted-foreground: #c4b5fd;
+    --accent: #432880;
+    --accent-foreground: #00d4ff;
+    --destructive: #f87171;
+    --destructive-foreground: #1a0f3e;
+    --border: rgba(196, 181, 253, 0.35);
+    --input: rgba(196, 181, 253, 0.25);
+    --ring: #00d4ff;
+    --chart-1: #00d4ff;
+    --chart-2: #5eead4;
+    --chart-3: #a78bfa;
+    --chart-4: #c4b5fd;
+    --chart-5: #f472b6;
+    --radius: 0.625rem;
+    --section-alt: #1a0f3e;
+    --sidebar: #2d1b69;
+    --sidebar-foreground: #f4f2ff;
+    --sidebar-primary: #00d4ff;
+    --sidebar-primary-foreground: #1a0f3e;
+    --sidebar-accent: #3d2a7a;
+    --sidebar-accent-foreground: #f4f2ff;
+    --sidebar-border: rgba(196, 181, 253, 0.3);
+    --sidebar-ring: #00d4ff;
+  }
+  .dark {
+    --background: #2d1b69;
+    --foreground: #f4f2ff;
+    --card: #24145a;
+    --card-foreground: #f4f2ff;
+    --popover: #24145a;
+    --popover-foreground: #f4f2ff;
+    --primary: #00d4ff;
+    --primary-foreground: #1a0f3e;
+    --secondary: #3d2a7a;
+    --secondary-foreground: #f4f2ff;
+    --muted: #362069;
+    --muted-foreground: #c4b5fd;
+    --accent: #432880;
+    --accent-foreground: #00d4ff;
+    --destructive: #f87171;
+    --destructive-foreground: #1a0f3e;
+    --border: rgba(196, 181, 253, 0.35);
+    --input: rgba(196, 181, 253, 0.25);
+    --ring: #00d4ff;
+    --chart-1: #00d4ff;
+    --chart-2: #5eead4;
+    --chart-3: #a78bfa;
+    --chart-4: #c4b5fd;
+    --chart-5: #f472b6;
+    --sidebar: #2d1b69;
+    --sidebar-foreground: #f4f2ff;
+    --sidebar-primary: #00d4ff;
+    --sidebar-primary-foreground: #1a0f3e;
+    --sidebar-accent: #3d2a7a;
+    --sidebar-accent-foreground: #f4f2ff;
+    --sidebar-border: rgba(196, 181, 253, 0.3);
+    --sidebar-ring: #00d4ff;
+  }
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
