@@ -12,6 +12,8 @@ import { cn } from "@/lib/utils";
 
 type PlanTier = "default" | "popular" | "featured";
 
+const BTN_START = "Bắt đầu";
+
 const plans: {
   name: string;
   price: string;
@@ -20,6 +22,11 @@ const plans: {
   cpu: string;
   tier: PlanTier;
   accent: string;
+  description: string;
+  features: string[];
+  badge?: string;
+  cta?: string;
+  ctaLink?: string;
 }[] = [
   {
     name: "Starter",
@@ -29,6 +36,14 @@ const plans: {
     cpu: "2 vCPU",
     tier: "default",
     accent: "#FF6B35",
+    description: "Khởi đầu với VPS ổn định và điều khiển mọi thứ qua Telegram.",
+    features: [
+      "VPS 4GB RAM / 2 vCPU, hoạt động 24/7",
+      "Cài đặt OpenClaw miễn phí",
+      "Điều khiển toàn bộ qua Telegram",
+      "Kết nối Gmail, Facebook Page, Google Sheet",
+      "Tự do tùy chỉnh đầy đủ",
+    ],
   },
   {
     name: "Pro",
@@ -37,25 +52,55 @@ const plans: {
     ram: "8GB RAM",
     cpu: "4 vCPU",
     tier: "popular",
-    accent: "#4CAF50",
+    accent: "#00D4FF",
+    description: "Tự động hóa nâng cao, kế toán AI và chăm sóc khách hàng tự động.",
+    features: [
+      "Tất cả tính năng Starter",
+      "n8n workflows tích hợp sẵn",
+      "Kế toán AI: tự động ghi nhận doanh thu/chi phí",
+      "Báo cáo doanh thu hàng ngày qua Telegram",
+      "Tự động chăm sóc và follow-up khách hàng",
+      "API key linh hoạt (pay-as-you-go)",
+    ],
+    badge: "Phổ biến nhất",
   },
   {
     name: "Business",
-    price: "1.199k",
+    price: "2.299k",
     period: "/tháng",
-    ram: "16GB RAM",
-    cpu: "6 vCPU",
+    ram: "8GB RAM",
+    cpu: "4 vCPU",
     tier: "featured",
-    accent: "#E91E8C",
+    accent: "#FF2D78",
+    description:
+      "Toàn bộ sức mạnh AI trong một gói — tạo nội dung, tự động hóa và vận hành 24/7.",
+    features: [
+      "Tất cả tính năng Pro",
+      "VPS nâng cấp 8GB RAM / 4 vCPU",
+      "🔥 Super AI Bundle mỗi tháng: 5,000,000 tokens · 750 ảnh 2K · 25 video AI",
+      "Tạo ảnh với Nano Banana Pro, video với Seedance 2.0",
+      "Chỉ nhắn mô tả trên Telegram → nhận ảnh/video ngay",
+      "Tích hợp Zalo, WhatsApp, Discord",
+      "Setup đầy đủ bởi đội ngũ VietClaw",
+    ],
   },
   {
-    name: "Agency",
-    price: "2.199k",
-    period: "/tháng",
+    name: "Enterprise",
+    price: "Liên hệ",
+    period: "",
     ram: "32GB RAM",
     cpu: "8 vCPU",
     tier: "default",
-    accent: "#FFC107",
+    accent: "#FFD700",
+    description: "Hạ tầng tùy chỉnh hoàn toàn, SLA và đội ngũ kỹ thuật riêng.",
+    features: [
+      "Hạ tầng tùy chỉnh, không giới hạn bot",
+      "Tích hợp ERP/CRM/phần mềm nội bộ",
+      "SLA uptime 99.9%",
+      "Đội kỹ thuật riêng",
+    ],
+    cta: "Liên hệ ngay",
+    ctaLink: "mailto:contact@vietclaw.net",
   },
 ];
 
@@ -99,7 +144,7 @@ export function Pricing() {
                     className="inline-flex h-6 items-center rounded-full px-3 text-xs font-semibold text-white shadow-md"
                     style={{ backgroundColor: plan.accent }}
                   >
-                    Phổ biến
+                    {plan.badge}
                   </span>
                 </div>
               ) : null}
@@ -146,8 +191,12 @@ export function Pricing() {
                     : "text-muted-foreground"
                 )}
               >
+                <p>{plan.description}</p>
                 <p>{plan.ram}</p>
                 <p>{plan.cpu}</p>
+                {plan.features.map((feature) => (
+                  <p key={feature}>{feature}</p>
+                ))}
               </CardContent>
               <CardFooter
                 className={cn(
@@ -158,17 +207,17 @@ export function Pricing() {
                 )}
               >
                 <Link
-                  href="mailto:hello@vietclaw.net?subject=Đăng%20ký%20gói%20"
+                  href={plan.ctaLink ?? "/register"}
                   className={cn(
                     "inline-flex h-12 w-full shrink-0 items-center justify-center gap-2 rounded-lg border-2 text-sm font-semibold whitespace-nowrap outline-none transition-[filter] select-none hover:brightness-110 active:brightness-95",
-                    plan.name === "Agency" ? "text-[#1A0F3E]" : "text-white"
+                    plan.name === "Enterprise" ? "text-[#1A0F3E]" : "text-white"
                   )}
                   style={{
                     borderColor: plan.accent,
                     backgroundColor: plan.accent,
                   }}
                 >
-                  Chọn gói
+                  {plan.ctaLink ? plan.cta : BTN_START}
                 </Link>
               </CardFooter>
             </Card>
