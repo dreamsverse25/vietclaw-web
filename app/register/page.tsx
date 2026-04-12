@@ -1,6 +1,15 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { SignUp } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ComponentProps,
+} from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Clipboard } from "lucide-react";
@@ -55,6 +64,8 @@ function formatMoney(n: number) {
 }
 
 const emailOk = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+
+const signUpLegacyRedirect = { afterSignUpUrl: "/dashboard" } as const satisfies Record<string, string>;
 
 function RegisterInner() {
   const router = useRouter();
@@ -473,6 +484,19 @@ function RegisterInner() {
           </div>
         </div>
       </main>
+
+      <div className="hidden" aria-hidden>
+        <SignUp
+          {...(signUpLegacyRedirect as unknown as ComponentProps<typeof SignUp>)}
+          appearance={{
+            baseTheme: dark,
+            variables: { colorPrimary: "#00D4FF" },
+          }}
+          routing="path"
+          path="/register"
+          signInUrl="/login"
+        />
+      </div>
     </div>
   );
 }

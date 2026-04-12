@@ -1,6 +1,11 @@
 import { SignIn } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
+import type { ComponentProps } from "react";
 
-import { clerkDarkAppearance } from "@/lib/clerk-appearance";
+const signInLegacyRedirects = {
+  afterSignInUrl: "/dashboard",
+  redirectUrl: "/dashboard",
+} as const satisfies Record<string, string>;
 
 export default function LoginPage() {
   return (
@@ -9,11 +14,14 @@ export default function LoginPage() {
         {"\u0110\u0103ng nh\u1EADp v\u00E0o VietClaw"}
       </p>
       <SignIn
-        appearance={clerkDarkAppearance}
+        {...(signInLegacyRedirects as unknown as ComponentProps<typeof SignIn>)}
+        appearance={{
+          baseTheme: dark,
+          variables: { colorPrimary: "#00D4FF" },
+        }}
         routing="path"
         path="/login"
         signUpUrl="/register"
-        fallbackRedirectUrl="/dashboard"
       />
     </div>
   );
