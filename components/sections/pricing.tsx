@@ -100,7 +100,7 @@ const plans: {
       "Đội kỹ thuật riêng",
     ],
     cta: "Liên hệ ngay",
-    ctaLink: "mailto:contact@vietclaw.net",
+    ctaLink: "/contact",
   },
 ];
 
@@ -207,7 +207,11 @@ export function Pricing() {
                 )}
               >
                 <Link
-                  href={plan.ctaLink ?? "/register"}
+                  href={
+                    plan.ctaLink
+                      ? plan.ctaLink
+                      : `/register?plan=${plan.name.toLowerCase()}`
+                  }
                   className={cn(
                     "inline-flex h-12 w-full shrink-0 items-center justify-center gap-2 rounded-lg border-2 text-sm font-semibold whitespace-nowrap outline-none transition-[filter] select-none hover:brightness-110 active:brightness-95",
                     plan.name === "Enterprise" ? "text-[#1A0F3E]" : "text-white"
