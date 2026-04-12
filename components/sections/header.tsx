@@ -17,7 +17,6 @@ const LABELS = {
   homeAria: "VietClaw \u2014 Trang ch\u1ee7",
   signIn: "\u0110\u0103ng nh\u1eadp",
   signUp: "\u0110\u0103ng k\xfd",
-  trial: "D\xf9ng th\u1eed 7 ng\xe0y",
   dashboard: "Dashboard",
 } as const;
 
@@ -29,11 +28,6 @@ const ghostOnDark = cn(
 const outlineSignUp = cn(
   buttonVariants({ variant: "outline", size: "sm" }),
   "border-[#C4B5FD]/40 bg-[#2D1B69]/40 text-[#F4F2FF] hover:bg-[#C4B5FD]/12 hover:text-[#F4F2FF]",
-);
-
-const primaryTrial = cn(
-  buttonVariants({ variant: "default", size: "sm" }),
-  "border-2 border-[#00d4ff] bg-[#00d4ff] font-semibold text-[#1a0f3e] shadow-none hover:bg-[#33ddff] hover:brightness-105",
 );
 
 const dashboardBtn = cn(
@@ -50,15 +44,14 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
         <Link
           href="#"
-          className="flex h-full shrink-0 items-center leading-none"
+          className="flex h-full shrink-0 items-center gap-2 leading-none"
           aria-label={LABELS.homeAria}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/logo.png"
+            src="/vietclaw-logo.png"
             alt="VietClaw"
-            className="object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]"
-            style={{ height: 48, width: "auto" }}
+            className="h-10 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]"
           />
         </Link>
         <nav className="hidden h-full flex-1 items-center justify-center gap-8 text-sm font-medium sm:flex">
@@ -89,9 +82,6 @@ export function Header() {
               </Link>
               <Link href="/register" className={outlineSignUp}>
                 {LABELS.signUp}
-              </Link>
-              <Link href="/register" className={primaryTrial}>
-                {LABELS.trial}
               </Link>
             </>
           )}
