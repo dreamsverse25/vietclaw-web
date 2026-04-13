@@ -48,14 +48,10 @@ const PLANS: {
   },
 ];
 
-const BANK_ID = "SACOMBANK";
-const ACCOUNT_NAME = "NGUYEN THI HOANG ANH";
-const BANK_LABEL = "Sacombank";
-
-const VIRTUAL_ACCOUNT_NO_BY_PLAN: Record<PlanId, string> = {
-  starter: "SEP10004VCSTARTER",
-  pro: "SEP10004VCPRO",
-  business: "SEP10004VCBUSINESS",
+const VIRTUAL_ACCOUNTS: Record<PlanId, string> = {
+  starter: "SEP100014VCSTARTER",
+  pro: "SEP100014VCPRO",
+  business: "SEP100014VCBUSINESS",
 };
 
 function resolveSelectedPlan(planFromURL: string | null): PlanId {
@@ -98,8 +94,6 @@ function RegisterInner() {
     [plan],
   );
 
-  const accountNo = VIRTUAL_ACCOUNT_NO_BY_PLAN[selected.id];
-
   const formValid =
     name.trim().length > 0 &&
     emailOk(email.trim()) &&
@@ -107,14 +101,15 @@ function RegisterInner() {
 
   const transferContent = `VIETCLAW ${email.trim()}`;
   const qrSrc = useMemo(() => {
-    const base = `https://img.vietqr.io/image/${BANK_ID}-${accountNo}-compact2.png`;
-    const q = new URLSearchParams({
+    const va = VIRTUAL_ACCOUNTS[plan];
+    const params = new URLSearchParams({
+      acc: va,
+      bank: "Sacombank",
       amount: String(selected.amount),
-      addInfo: `VIETCLAW ${email.trim() || "email@example.com"}`,
-      accountName: ACCOUNT_NAME,
+      des: `VIETCLAW ${email.trim() || "email@example.com"}`,
     });
-    return `${base}?${q.toString()}`;
-  }, [selected.amount, selected.id, email]);
+    return `https://qr.sepay.vn/img?${params.toString()}`;
+  }, [plan, selected.amount, email]);
 
   const showToast = useCallback((msg: string) => {
     setToast(msg);
@@ -386,7 +381,7 @@ function RegisterInner() {
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={qrSrc}
-                        alt="Mã QR VietQR thanh toán"
+                        alt="Mã QR thanh toán Sepay"
                         width={260}
                         height={260}
                         className="rounded-lg bg-white p-2"
@@ -401,15 +396,15 @@ function RegisterInner() {
                     <ul className="mt-4 space-y-3 text-sm">
                       <li className="flex flex-wrap items-center justify-between gap-2">
                         <span className="text-neutral-400">Ngân hàng:</span>
-                        <span className="text-white">{BANK_LABEL}</span>
+                        <span className="text-white">Sacombank</span>
                       </li>
                       <li className="flex flex-wrap items-center justify-between gap-2">
                         <span className="text-neutral-400">Số TK:</span>
                         <span className="flex items-center gap-2 font-mono text-white">
-                          {accountNo}
+                          {VIRTUAL_ACCOUNTS[plan]}
                           <button
                             type="button"
-                            onClick={() => copyText(accountNo)}
+                            onClick={() => copyText(VIRTUAL_ACCOUNTS[plan])}
                             className="inline-flex rounded-md border border-[#333] p-1.5 text-[#00d4ff] transition-colors hover:bg-white/5"
                             aria-label="Sao chép số tài khoản"
                           >
@@ -420,10 +415,10 @@ function RegisterInner() {
                       <li className="flex flex-wrap items-center justify-between gap-2">
                         <span className="text-neutral-400">Chủ TK:</span>
                         <span className="flex items-center gap-2 text-white">
-                          {ACCOUNT_NAME}
+                          NGUYEN THI HOANG ANH
                           <button
                             type="button"
-                            onClick={() => copyText(ACCOUNT_NAME)}
+                            onClick={() => copyText("NGUYEN THI HOANG ANH")}
                             className="inline-flex rounded-md border border-[#333] p-1.5 text-[#00d4ff] transition-colors hover:bg-white/5"
                             aria-label="Sao chép tên chủ tài khoản"
                           >
