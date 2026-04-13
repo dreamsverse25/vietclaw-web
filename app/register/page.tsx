@@ -87,6 +87,7 @@ function RegisterInner() {
   const [toast, setToast] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [existsNotice, setExistsNotice] = useState(false);
   const [success, setSuccess] = useState(false);
 
   const selected = useMemo(
@@ -133,6 +134,7 @@ function RegisterInner() {
     if (!formValid || submitting) return;
     setSubmitting(true);
     setApiError(null);
+    setExistsNotice(false);
     try {
       const res = await fetch("/api/register", {
         method: "POST",
@@ -146,9 +148,13 @@ function RegisterInner() {
           message: message.trim() || null,
         }),
       });
-      const data = (await res.json()) as { error?: string; success?: boolean };
+      const data = (await res.json()) as { error?: string; success?: boolean; exists?: boolean };
       if (!res.ok) {
         setApiError(data.error ?? "Có lỗi xảy ra.");
+        return;
+      }
+      if (data.exists === true) {
+        setExistsNotice(true);
         return;
       }
       if (data.success === true) {
@@ -336,6 +342,20 @@ function RegisterInner() {
                   </div>
                 </section>
 
+                {existsNotice ? (
+                  <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-3 text-amber-300">
+                    <p className="text-sm">
+                      Email này đã có tài khoản. Vui lòng đăng nhập để xem dashboard hoặc nâng cấp
+                      gói.
+                    </p>
+                    <Link
+                      href="/login"
+                      className="mt-2 inline-block text-sm font-medium text-amber-200 underline-offset-2 hover:underline"
+                    >
+                      {"\u0110\u0103ng nh\u1eadp ngay \u2192"}
+                    </Link>
+                  </div>
+                ) : null}
                 {apiError ? (
                   <p className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">
                     {apiError}

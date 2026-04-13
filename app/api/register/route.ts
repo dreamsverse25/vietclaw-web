@@ -74,10 +74,7 @@ export async function POST(req: Request) {
   }
 
   if (existing) {
-    return NextResponse.json(
-      { exists: true, message: "Email \u0111\u00e3 \u0111\u0103ng k\u00fd" },
-      { status: 200 },
-    );
+    return NextResponse.json({ exists: true, message: "Email đã đăng ký" }, { status: 200 });
   }
 
   const amount = PLAN_AMOUNTS[plan];
