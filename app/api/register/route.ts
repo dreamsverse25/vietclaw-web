@@ -1,6 +1,4 @@
-import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
 
 import { createServiceRoleClient } from "@/lib/supabase/service";
 
@@ -14,6 +12,12 @@ const PLAN_AMOUNTS: Record<Plan, number> = {
   business: 2_299_000,
 };
 
+const VIRTUAL_ACCOUNT_BY_PLAN: Record<Plan, string> = {
+  starter: "SEP10004VCSTARTER",
+  pro: "SEP10004VCPRO",
+  business: "SEP10004VCBUSINESS",
+};
+
 function isPlan(v: unknown): v is Plan {
   return v === "starter" || v === "pro" || v === "business";
 }
@@ -23,130 +27,80 @@ export async function POST(req: Request) {
   try {
     body = (await req.json()) as Record<string, unknown>;
   } catch {
-    return NextResponse.json({ error: "Payload không hợp lệ" }, { status: 400 });
+    return NextResponse.json({ error: "Payload kh\u00f4ng h\u1ee3p l\u1ec7" }, { status: 400 });
   }
 
   const name = typeof body.name === "string" ? body.name.trim() : "";
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
   const phone = typeof body.phone === "string" ? body.phone.trim() : "";
-  const company =
-    typeof body.company === "string" && body.company.trim() ? body.company.trim() : null;
-  const message =
-    typeof body.message === "string" && body.message.trim() ? body.message.trim() : null;
   const plan = body.plan;
 
   if (!name || !email || !phone || !isPlan(plan)) {
     return NextResponse.json(
-      { error: "Thiếu hoặc sai thông tin bắt buộc (họ tên, email, SĐT, gói)." },
+      {
+        error:
+          "Thi\u1ebfu ho\u1eb7c sai th\u00f4ng tin b\u1eaft bu\u1ed9c (h\u1ecdc t\u00ean, email, S\u0110T, g\u00f3i).",
+      },
       { status: 400 },
     );
   }
 
-  const amount = PLAN_AMOUNTS[plan];
   const supabase = createServiceRoleClient();
   if (!supabase) {
     return NextResponse.json(
-      { error: "Chưa cấu hình Supabase (NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY)." },
+      {
+        error:
+          "Ch\u01b0a c\u1ea5u h\u00ecnh Supabase (NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY).",
+      },
       { status: 500 },
     );
   }
 
   const { data: existing, error: findErr } = await supabase
-    .from("users")
-    .select("id")
+    .from("subscriptions")
+    .select("*")
     .eq("email", email)
+    .limit(1)
     .maybeSingle();
 
   if (findErr) {
-    console.error("[register] find user", findErr);
-    return NextResponse.json({ error: "Không thể lưu đăng ký. Thử lại sau." }, { status: 500 });
+    console.error("[register] find subscription by email", findErr);
+    return NextResponse.json(
+      {
+        error: "Kh\u00f4ng th\u1ec3 ki\u1ec3m tra \u0111\u0103ng k\u00fd. Th\u1eed l\u1ea1i sau.",
+      },
+      { status: 500 },
+    );
   }
 
-  let userId: string;
-
-  if (existing?.id) {
-    userId = existing.id;
-    const { error: updErr } = await supabase
-      .from("users")
-      .update({
-        full_name: name,
-        phone,
-        shop_name: company,
-        registration_message: message,
-      })
-      .eq("id", userId);
-
-    if (updErr) {
-      console.error("[register] update user", updErr);
-      return NextResponse.json({ error: "Không thể cập nhật thông tin." }, { status: 500 });
-    }
-  } else {
-    const clerk_id = `pending_${randomUUID()}`;
-    const { data: inserted, error: insErr } = await supabase
-      .from("users")
-      .insert({
-        clerk_id,
-        email,
-        full_name: name,
-        phone,
-        shop_name: company,
-        registration_message: message,
-      })
-      .select("id")
-      .single();
-
-    if (insErr || !inserted?.id) {
-      console.error("[register] insert user", insErr);
-      return NextResponse.json({ error: "Không thể tạo bản ghi người dùng." }, { status: 500 });
-    }
-    userId = inserted.id;
+  if (existing) {
+    return NextResponse.json(
+      { exists: true, message: "Email \u0111\u00e3 \u0111\u0103ng k\u00fd" },
+      { status: 200 },
+    );
   }
 
-  const { error: subErr } = await supabase.from("subscriptions").insert({
-    user_id: userId,
+  const amount = PLAN_AMOUNTS[plan];
+  const paymentCode = `VIETCLAW ${email}`;
+
+  const { error: insErr } = await supabase.from("subscriptions").insert({
+    name,
+    email,
+    phone,
     plan,
     status: "pending",
     amount,
+    payment_code: paymentCode,
+    virtual_account: VIRTUAL_ACCOUNT_BY_PLAN[plan],
   });
 
-  if (subErr) {
-    console.error("[register] insert subscription", subErr);
-    return NextResponse.json({ error: "Không thể lưu gói đăng ký." }, { status: 500 });
+  if (insErr) {
+    console.error("[register] insert subscription", insErr);
+    return NextResponse.json(
+      { error: "Kh\u00f4ng th\u1ec3 l\u01b0u \u0111\u0103ng k\u00fd." },
+      { status: 500 },
+    );
   }
 
-  const resendKey = process.env.RESEND_API_KEY;
-  const from = process.env.RESEND_FROM_EMAIL ?? "VietClaw <noreply@vietclaw.net>";
-  if (resendKey) {
-    try {
-      const resend = new Resend(resendKey);
-      await resend.emails.send({
-        from,
-        to: "admin@vietclaw.net",
-        subject: `[VietClaw] Đăng ký mới — ${plan.toUpperCase()} — ${email}`,
-        html: `
-          <h2>Đăng ký mới</h2>
-          <p><strong>Họ tên:</strong> ${escapeHtml(name)}</p>
-          <p><strong>Email:</strong> ${escapeHtml(email)}</p>
-          <p><strong>SĐT:</strong> ${escapeHtml(phone)}</p>
-          <p><strong>Doanh nghiệp:</strong> ${company ? escapeHtml(company) : "—"}</p>
-          <p><strong>Gói:</strong> ${escapeHtml(plan)}</p>
-          <p><strong>Số tiền:</strong> ${amount.toLocaleString("vi-VN")}đ</p>
-          <p><strong>Nhu cầu:</strong></p>
-          <p>${message ? escapeHtml(message).replace(/\n/g, "<br/>") : "—"}</p>
-        `,
-      });
-    } catch (e) {
-      console.error("[register] Resend", e);
-    }
-  }
-
-  return NextResponse.json({ success: true, userId });
-}
-
-function escapeHtml(s: string) {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+  return NextResponse.json({ success: true, paymentCode, amount }, { status: 200 });
 }
