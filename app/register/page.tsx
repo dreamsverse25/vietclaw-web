@@ -48,10 +48,15 @@ const PLANS: {
   },
 ];
 
-const BANK_ID = "MB";
-const ACCOUNT_NO = "0123456789";
-const ACCOUNT_NAME = "NGUYEN VAN A";
-const BANK_LABEL = "MB Bank";
+const BANK_ID = "SACOMBANK";
+const ACCOUNT_NAME = "NGUYEN THI HOANG ANH";
+const BANK_LABEL = "Sacombank";
+
+const VIRTUAL_ACCOUNT_NO_BY_PLAN: Record<PlanId, string> = {
+  starter: "SEP10004VCSTARTER",
+  pro: "SEP10004VCPRO",
+  business: "SEP10004VCBUSINESS",
+};
 
 function resolveSelectedPlan(planFromURL: string | null): PlanId {
   if (planFromURL === "starter") return "starter";
@@ -93,6 +98,8 @@ function RegisterInner() {
     [plan],
   );
 
+  const accountNo = VIRTUAL_ACCOUNT_NO_BY_PLAN[selected.id];
+
   const formValid =
     name.trim().length > 0 &&
     emailOk(email.trim()) &&
@@ -100,14 +107,14 @@ function RegisterInner() {
 
   const transferContent = `VIETCLAW ${email.trim()}`;
   const qrSrc = useMemo(() => {
-    const base = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-compact2.png`;
+    const base = `https://img.vietqr.io/image/${BANK_ID}-${accountNo}-compact2.png`;
     const q = new URLSearchParams({
       amount: String(selected.amount),
       addInfo: `VIETCLAW ${email.trim() || "email@example.com"}`,
       accountName: ACCOUNT_NAME,
     });
     return `${base}?${q.toString()}`;
-  }, [selected.amount, email]);
+  }, [selected.amount, selected.id, email]);
 
   const showToast = useCallback((msg: string) => {
     setToast(msg);
@@ -399,10 +406,10 @@ function RegisterInner() {
                       <li className="flex flex-wrap items-center justify-between gap-2">
                         <span className="text-neutral-400">Số TK:</span>
                         <span className="flex items-center gap-2 font-mono text-white">
-                          {ACCOUNT_NO}
+                          {accountNo}
                           <button
                             type="button"
-                            onClick={() => copyText(ACCOUNT_NO)}
+                            onClick={() => copyText(accountNo)}
                             className="inline-flex rounded-md border border-[#333] p-1.5 text-[#00d4ff] transition-colors hover:bg-white/5"
                             aria-label="Sao chép số tài khoản"
                           >
